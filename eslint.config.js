@@ -7,6 +7,14 @@ module.exports = defineConfig([
   expoConfig,
   eslintPluginPrettierRecommended,
   {
+    plugins: {
+      'react-native': require('eslint-plugin-react-native'),
+    },
+    rules: {
+      'react-native/no-unused-styles': 'error',
+    },
+  },
+  {
     ignores: ['dist/*'],
   },
 ])

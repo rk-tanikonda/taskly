@@ -92,3 +92,6 @@ yarn.lock
 
 # Cursor
 .cursor/
+
+# Prettier
+.prettierrc.json
