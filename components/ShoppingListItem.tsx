@@ -48,7 +48,11 @@ export const ShoppingListItem = ({
       onPress={onToggleComplete}
     >
       <View style={styles.itemTextContainer}>
-        <Entypo name='check' size={24} color={theme.colors.cerulean} />
+        <Entypo
+          name={isCompleted ? 'check' : 'circle'}
+          size={24}
+          color={isCompleted ? theme.colors.cerulean : theme.colors.gray}
+        />
         <Text
           style={[styles.itemText, isCompleted && styles.completedButtonText]}
           numberOfLines={1}
@@ -56,7 +60,9 @@ export const ShoppingListItem = ({
           {name}
         </Text>
       </View>
-      <Text style={styles.completedAtText}>{completedAtText}</Text>
+      {completedAt && (
+        <Text style={styles.completedAtText}>{completedAtText}</Text>
+      )}
       <TouchableOpacity onPress={handleDelete} activeOpacity={0.5}>
         <AntDesign
           name='close-circle'
@@ -75,12 +81,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     borderBottomColor: theme.colors.cerulean,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 8,
   },
   itemText: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
     flex: 1,
   },
   itemTextContainer: {
@@ -99,7 +105,9 @@ const styles = StyleSheet.create({
     textDecorationColor: theme.colors.gray,
   },
   completedAtText: {
-    fontSize: 12,
+    textAlign: 'center',
+    fontSize: 10,
     color: theme.colors.gray,
+    flex: 1,
   },
 })

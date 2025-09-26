@@ -1,88 +1,206 @@
-import { StyleSheet, TextInput, View, FlatList, Text } from 'react-native'
-import { useState } from 'react'
+import {
+  StyleSheet,
+  TextInput,
+  View,
+  FlatList,
+  Text,
+  LayoutAnimation,
+} from 'react-native'
+import { useEffect, useState } from 'react'
 import { theme } from '../theme'
 import { ShoppingListItem } from '../components/ShoppingListItem'
+import { getFromStorage, saveToStorage } from '../utils/storage'
 
 type ShoppingListItemType = {
   id: string
   name: string
   isCompleted?: boolean
-  completedAt?: number
+  completedAtTimestamp?: number
+  lastUpdatedTimestamp: number
 }
 
-const initialItems: ShoppingListItemType[] = [
-  { id: '1', name: 'Coffee', isCompleted: false },
-  { id: '2', name: 'Tea', isCompleted: false },
-  { id: '3', name: 'Milk', isCompleted: false },
-  { id: '4', name: 'Bread', isCompleted: false },
-  { id: '5', name: 'Eggs', isCompleted: false },
-  { id: '6', name: 'Cheese', isCompleted: false },
-  { id: '7', name: 'Butter', isCompleted: false },
-  { id: '8', name: 'Sugar', isCompleted: false },
-  { id: '9', name: 'Salt', isCompleted: false },
-  { id: '10', name: 'Pepper', isCompleted: false },
-  { id: '11', name: 'Cereal', isCompleted: false },
-  { id: '12', name: 'Yogurt', isCompleted: false },
-  { id: '13', name: 'Chicken', isCompleted: false },
-  { id: '14', name: 'Beef', isCompleted: false },
-  { id: '15', name: 'Pork', isCompleted: false },
-  { id: '16', name: 'Fish', isCompleted: false },
-  { id: '17', name: 'Shrimp', isCompleted: false },
-  { id: '18', name: 'Tofu', isCompleted: false },
-  { id: '19', name: 'Vegetables', isCompleted: false },
-  { id: '20', name: 'Fruits', isCompleted: false },
-  { id: '21', name: 'Nuts', isCompleted: false },
-  { id: '22', name: 'Seeds', isCompleted: false },
-  { id: '23', name: 'Honey', isCompleted: false },
-  { id: '24', name: 'Jam', isCompleted: false },
-  { id: '25', name: 'Jelly', isCompleted: false },
-  { id: '26', name: 'Condiments', isCompleted: false },
-  { id: '27', name: 'Sauces', isCompleted: false },
-  { id: '28', name: 'Spices', isCompleted: false },
-  { id: '29', name: 'Herbs', isCompleted: false },
-  { id: '30', name: 'Dairy', isCompleted: false },
-  { id: '31', name: 'Meat', isCompleted: false },
-  { id: '32', name: 'Poultry', isCompleted: false },
-  { id: '33', name: 'Seafood', isCompleted: false },
-  { id: '34', name: 'Beverages', isCompleted: false },
-]
+// const initialItems: ShoppingListItemType[] = [
+//   {
+//     id: '1',
+//     name: 'Coffee',
+//     isCompleted: false,
+//     lastUpdatedTimestamp: Date.now(),
+//   },
+//   {
+//     id: '2',
+//     name: 'Tea',
+//     isCompleted: false,
+//     lastUpdatedTimestamp: Date.now(),
+//   },
+//   {
+//     id: '3',
+//     name: 'Milk',
+//     isCompleted: false,
+//     lastUpdatedTimestamp: Date.now(),
+//   },
+//   {
+//     id: '4',
+//     name: 'Bread',
+//     isCompleted: false,
+//     lastUpdatedTimestamp: Date.now(),
+//   },
+//   {
+//     id: '5',
+//     name: 'Eggs',
+//     isCompleted: false,
+//     lastUpdatedTimestamp: Date.now(),
+//   },
+//   {
+//     id: '6',
+//     name: 'Cheese',
+//     isCompleted: false,
+//     lastUpdatedTimestamp: Date.now(),
+//   },
+//   {
+//     id: '7',
+//     name: 'Butter',
+//     isCompleted: false,
+//     lastUpdatedTimestamp: Date.now(),
+//   },
+//   {
+//     id: '8',
+//     name: 'Sugar',
+//     isCompleted: false,
+//     lastUpdatedTimestamp: Date.now(),
+//   },
+//   {
+//     id: '9',
+//     name: 'Salt',
+//     isCompleted: false,
+//     lastUpdatedTimestamp: Date.now(),
+//   },
+//   {
+//     id: '10',
+//     name: 'Pepper',
+//     isCompleted: false,
+//     lastUpdatedTimestamp: Date.now(),
+//   },
+//   {
+//     id: '11',
+//     name: 'Yogurt',
+//     isCompleted: false,
+//     lastUpdatedTimestamp: Date.now(),
+//   },
+//   {
+//     id: '12',
+//     name: 'Cereal',
+//     isCompleted: false,
+//     lastUpdatedTimestamp: Date.now(),
+//   },
+//   {
+//     id: '13',
+//     name: 'Chicken',
+//     isCompleted: false,
+//     lastUpdatedTimestamp: Date.now(),
+//   },
+//   {
+//     id: '14',
+//     name: 'Beef',
+//     isCompleted: false,
+//     lastUpdatedTimestamp: Date.now(),
+//   },
+//   {
+//     id: '15',
+//     name: 'Pork',
+//     isCompleted: false,
+//     lastUpdatedTimestamp: Date.now(),
+//   },
+//   {
+//     id: '16',
+//     name: 'Fish',
+//     isCompleted: false,
+//     lastUpdatedTimestamp: Date.now(),
+//   },
+// ]
 
 // const testData = Array.from({ length: 1000 }, (_, index) => ({
 //   id: index.toString(),
 //   name: `Item ${index + 1}`,
 //   isCompleted: false,
+//   lastUpdatedTimestamp: Date.now(),
 // }))
 
 export default function App() {
   const [value, setValue] = useState('')
-  const [shoppingListItems, setShoppingListItems] =
-    useState<ShoppingListItemType[]>(initialItems)
+  const [shoppingListItems, setShoppingListItems] = useState<
+    ShoppingListItemType[]
+  >([])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getFromStorage('shoppingListItems')
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
+      setShoppingListItems(data || [])
+    }
+    fetchData()
+  }, [])
 
   const handleSubmit = () => {
     if (value.trim() === '') return
-    setShoppingListItems([
-      { id: (shoppingListItems.length + 1).toString(), name: value },
+    const newShoppingListItems = [
+      {
+        id: (shoppingListItems.length + 1).toString(),
+        name: value,
+        lastUpdatedTimestamp: Date.now(),
+      },
       ...shoppingListItems,
-    ])
+    ]
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
+    setShoppingListItems(newShoppingListItems)
+    saveToStorage('shoppingListItems', newShoppingListItems)
     setValue('')
   }
 
   const handleDelete = (id: string) => {
-    setShoppingListItems(shoppingListItems.filter((item) => item.id !== id))
+    const newShoppingListItems = shoppingListItems.filter(
+      (item) => item.id !== id
+    )
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
+    setShoppingListItems(newShoppingListItems)
+    saveToStorage('shoppingListItems', newShoppingListItems)
   }
 
   const handleToggleComplete = (id: string) => {
-    setShoppingListItems(
-      shoppingListItems.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              isCompleted: !item.isCompleted,
-              completedAt: !item.isCompleted ? Date.now() : undefined,
-            }
-          : item
-      )
+    const newShoppingListItems = shoppingListItems.map((item) =>
+      item.id === id
+        ? {
+            ...item,
+            isCompleted: !item.isCompleted,
+            completedAtTimestamp: !item.isCompleted ? Date.now() : undefined,
+            lastUpdatedTimestamp: Date.now(),
+          }
+        : item
     )
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
+    setShoppingListItems(newShoppingListItems)
+    saveToStorage('shoppingListItems', newShoppingListItems)
+  }
+
+  const orderShoppingList = (shoppingList: ShoppingListItemType[]) => {
+    return shoppingList.sort((item1, item2) => {
+      if (item1.completedAtTimestamp && item2.completedAtTimestamp) {
+        return item2.completedAtTimestamp - item1.completedAtTimestamp
+      }
+
+      if (item1.completedAtTimestamp && !item2.completedAtTimestamp) {
+        return 1
+      }
+
+      if (!item1.completedAtTimestamp && item2.completedAtTimestamp) {
+        return -1
+      }
+
+      if (!item1.completedAtTimestamp && !item2.completedAtTimestamp) {
+        return item2.lastUpdatedTimestamp - item1.lastUpdatedTimestamp
+      }
+
+      return 0
+    })
   }
 
   return (
@@ -90,14 +208,14 @@ export default function App() {
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
       stickyHeaderIndices={[0]}
-      data={shoppingListItems}
+      data={orderShoppingList(shoppingListItems)}
       renderItem={({ item }) => (
         <ShoppingListItem
           name={item.name}
           onDelete={() => handleDelete(item.id)}
           onToggleComplete={() => handleToggleComplete(item.id)}
           isCompleted={item.isCompleted}
-          completedAt={item.completedAt}
+          completedAt={item.completedAtTimestamp}
         />
       )}
       ListHeaderComponent={
