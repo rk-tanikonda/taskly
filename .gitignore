@@ -85,6 +85,10 @@ jspm_packages/
 
 # Yarn cache and internal files
 .yarn/
+yarn.lock
 
 # Expo
 .expo-shared/
+
+# Cursor
+.cursor/
