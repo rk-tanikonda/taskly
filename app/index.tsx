@@ -1,11 +1,4 @@
-import {
-  StyleSheet,
-  TextInput,
-  View,
-  ScrollView,
-  FlatList,
-  Text,
-} from 'react-native'
+import { StyleSheet, TextInput, View, FlatList, Text } from 'react-native'
 import { useState } from 'react'
 import { theme } from '../theme'
 import { ShoppingListItem } from '../components/ShoppingListItem'
@@ -13,55 +6,57 @@ import { ShoppingListItem } from '../components/ShoppingListItem'
 type ShoppingListItemType = {
   id: string
   name: string
+  isCompleted?: boolean
+  completedAt?: number
 }
 
 const initialItems: ShoppingListItemType[] = [
-  { id: '1', name: 'Coffee' },
-  { id: '2', name: 'Tea' },
-  { id: '3', name: 'Milk' },
-  { id: '4', name: 'Bread' },
-  { id: '5', name: 'Eggs' },
-  { id: '6', name: 'Cheese' },
-  { id: '7', name: 'Butter' },
-  { id: '8', name: 'Sugar' },
-  { id: '9', name: 'Salt' },
-  { id: '10', name: 'Pepper' },
-  { id: '11', name: 'Cereal' },
-  { id: '12', name: 'Yogurt' },
-  { id: '13', name: 'Chicken' },
-  { id: '14', name: 'Beef' },
-  { id: '15', name: 'Pork' },
-  { id: '16', name: 'Fish' },
-  { id: '17', name: 'Shrimp' },
-  { id: '18', name: 'Tofu' },
-  { id: '19', name: 'Vegetables' },
-  { id: '20', name: 'Fruits' },
-  { id: '21', name: 'Nuts' },
-  { id: '22', name: 'Seeds' },
-  { id: '23', name: 'Honey' },
-  { id: '24', name: 'Jam' },
-  { id: '25', name: 'Jelly' },
-  { id: '26', name: 'Condiments' },
-  { id: '27', name: 'Sauces' },
-  { id: '28', name: 'Spices' },
-  { id: '29', name: 'Herbs' },
-  { id: '30', name: 'Dairy' },
-  { id: '31', name: 'Meat' },
-  { id: '32', name: 'Poultry' },
-  { id: '33', name: 'Seafood' },
-  { id: '34', name: 'Beverages' },
+  { id: '1', name: 'Coffee', isCompleted: false },
+  { id: '2', name: 'Tea', isCompleted: false },
+  { id: '3', name: 'Milk', isCompleted: false },
+  { id: '4', name: 'Bread', isCompleted: false },
+  { id: '5', name: 'Eggs', isCompleted: false },
+  { id: '6', name: 'Cheese', isCompleted: false },
+  { id: '7', name: 'Butter', isCompleted: false },
+  { id: '8', name: 'Sugar', isCompleted: false },
+  { id: '9', name: 'Salt', isCompleted: false },
+  { id: '10', name: 'Pepper', isCompleted: false },
+  { id: '11', name: 'Cereal', isCompleted: false },
+  { id: '12', name: 'Yogurt', isCompleted: false },
+  { id: '13', name: 'Chicken', isCompleted: false },
+  { id: '14', name: 'Beef', isCompleted: false },
+  { id: '15', name: 'Pork', isCompleted: false },
+  { id: '16', name: 'Fish', isCompleted: false },
+  { id: '17', name: 'Shrimp', isCompleted: false },
+  { id: '18', name: 'Tofu', isCompleted: false },
+  { id: '19', name: 'Vegetables', isCompleted: false },
+  { id: '20', name: 'Fruits', isCompleted: false },
+  { id: '21', name: 'Nuts', isCompleted: false },
+  { id: '22', name: 'Seeds', isCompleted: false },
+  { id: '23', name: 'Honey', isCompleted: false },
+  { id: '24', name: 'Jam', isCompleted: false },
+  { id: '25', name: 'Jelly', isCompleted: false },
+  { id: '26', name: 'Condiments', isCompleted: false },
+  { id: '27', name: 'Sauces', isCompleted: false },
+  { id: '28', name: 'Spices', isCompleted: false },
+  { id: '29', name: 'Herbs', isCompleted: false },
+  { id: '30', name: 'Dairy', isCompleted: false },
+  { id: '31', name: 'Meat', isCompleted: false },
+  { id: '32', name: 'Poultry', isCompleted: false },
+  { id: '33', name: 'Seafood', isCompleted: false },
+  { id: '34', name: 'Beverages', isCompleted: false },
 ]
 
 // const testData = Array.from({ length: 1000 }, (_, index) => ({
 //   id: index.toString(),
 //   name: `Item ${index + 1}`,
+//   isCompleted: false,
 // }))
 
 export default function App() {
   const [value, setValue] = useState('')
-  const [shoppingListItems, setShoppingListItems] = useState<
-    ShoppingListItemType[]
-  >([])
+  const [shoppingListItems, setShoppingListItems] =
+    useState<ShoppingListItemType[]>(initialItems)
 
   const handleSubmit = () => {
     if (value.trim() === '') return
@@ -72,13 +67,39 @@ export default function App() {
     setValue('')
   }
 
+  const handleDelete = (id: string) => {
+    setShoppingListItems(shoppingListItems.filter((item) => item.id !== id))
+  }
+
+  const handleToggleComplete = (id: string) => {
+    setShoppingListItems(
+      shoppingListItems.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              isCompleted: !item.isCompleted,
+              completedAt: !item.isCompleted ? Date.now() : undefined,
+            }
+          : item
+      )
+    )
+  }
+
   return (
     <FlatList
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
       stickyHeaderIndices={[0]}
       data={shoppingListItems}
-      renderItem={({ item }) => <ShoppingListItem name={item.name} />}
+      renderItem={({ item }) => (
+        <ShoppingListItem
+          name={item.name}
+          onDelete={() => handleDelete(item.id)}
+          onToggleComplete={() => handleToggleComplete(item.id)}
+          isCompleted={item.isCompleted}
+          completedAt={item.completedAt}
+        />
+      )}
       ListHeaderComponent={
         <TextInput
           style={styles.textInput}
@@ -102,7 +123,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.white,
-    paddingTop: 12,
+    paddingVertical: 12,
   },
   contentContainer: {
     paddingBottom: 24,
