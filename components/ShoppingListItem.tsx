@@ -1,11 +1,16 @@
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import AntDesign from '@expo/vector-icons/AntDesign'
 import { theme } from '../theme'
 
 type ShoppingListItemProps = {
   name: string
+  isCompleted?: boolean
 }
 
-export const ShoppingListItem = ({ name }: ShoppingListItemProps) => {
+export const ShoppingListItem = ({
+  name,
+  isCompleted,
+}: ShoppingListItemProps) => {
   const handleDelete = () => {
     Alert.alert('Delete', `Are you sure you want to delete this ${name}?`, [
       {
@@ -18,34 +23,31 @@ export const ShoppingListItem = ({ name }: ShoppingListItemProps) => {
   }
 
   return (
-    <View style={styles.itemContainer}>
-      <Text style={styles.itemText}>{name}</Text>
-      <TouchableOpacity
-        onPress={handleDelete}
-        activeOpacity={0.5}
-        style={styles.button}
+    <View
+      style={[
+        styles.itemContainer,
+        isCompleted && styles.completedItemContainer,
+      ]}
+    >
+      <Text
+        style={[styles.itemText, isCompleted && styles.completedButtonText]}
       >
-        <Text style={styles.buttonText}>Delete</Text>
+        {name}
+      </Text>
+      <TouchableOpacity onPress={handleDelete} activeOpacity={0.5}>
+        <AntDesign
+          name='close-circle'
+          size={24}
+          color={isCompleted ? theme.colors.gray : theme.colors.red}
+        />
       </TouchableOpacity>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  button: {
-    backgroundColor: theme.colors.black,
-    padding: 8,
-    borderRadius: 6,
-  },
-  buttonText: {
-    color: theme.colors.white,
-    fontSize: 16,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
   itemContainer: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 18,
     paddingVertical: 16,
     borderBottomWidth: 2,
     borderBottomColor: theme.colors.cerulean,
@@ -56,5 +58,14 @@ const styles = StyleSheet.create({
   itemText: {
     fontSize: 24,
     fontWeight: 'bold',
+  },
+  completedItemContainer: {
+    backgroundColor: theme.colors.lightGray,
+    borderBottomColor: theme.colors.lightGray,
+  },
+  completedButtonText: {
+    textDecorationLine: 'line-through',
+    textDecorationStyle: 'solid',
+    textDecorationColor: theme.colors.gray,
   },
 })
