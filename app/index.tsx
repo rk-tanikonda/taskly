@@ -20,6 +20,8 @@ type ShoppingListItemType = {
   lastUpdatedTimestamp: number
 }
 
+const storageKey = 'shoppingListItems'
+
 // const initialItems: ShoppingListItemType[] = [
 //   {
 //     id: '1',
@@ -134,7 +136,7 @@ export default function App() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getFromStorage('shoppingListItems')
+      const data = await getFromStorage(storageKey)
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
       setShoppingListItems(data || [])
     }
@@ -153,7 +155,7 @@ export default function App() {
     ]
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
     setShoppingListItems(newShoppingListItems)
-    saveToStorage('shoppingListItems', newShoppingListItems)
+    saveToStorage(storageKey, newShoppingListItems)
     setValue('')
   }
 
@@ -164,7 +166,7 @@ export default function App() {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
     setShoppingListItems(newShoppingListItems)
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
-    saveToStorage('shoppingListItems', newShoppingListItems)
+    saveToStorage(storageKey, newShoppingListItems)
   }
 
   const handleToggleComplete = (id: string) => {
@@ -187,7 +189,7 @@ export default function App() {
     })
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
     setShoppingListItems(newShoppingListItems)
-    saveToStorage('shoppingListItems', newShoppingListItems)
+    saveToStorage(storageKey, newShoppingListItems)
   }
 
   const orderShoppingList = (shoppingList: ShoppingListItemType[]) => {
