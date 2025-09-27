@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react'
 import { theme } from '../theme'
 import { ShoppingListItem } from '../components/ShoppingListItem'
 import { getFromStorage, saveToStorage } from '../utils/storage'
+import * as Haptics from 'expo-haptics'
 
 type ShoppingListItemType = {
   id: string
@@ -162,20 +163,28 @@ export default function App() {
     )
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
     setShoppingListItems(newShoppingListItems)
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
     saveToStorage('shoppingListItems', newShoppingListItems)
   }
 
   const handleToggleComplete = (id: string) => {
-    const newShoppingListItems = shoppingListItems.map((item) =>
-      item.id === id
-        ? {
-            ...item,
-            isCompleted: !item.isCompleted,
-            completedAtTimestamp: !item.isCompleted ? Date.now() : undefined,
-            lastUpdatedTimestamp: Date.now(),
-          }
-        : item
-    )
+    const newShoppingListItems = shoppingListItems.map((item) => {
+      if (item.id === id) {
+        if (item.completedAtTimestamp) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+        } else {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+        }
+        return {
+          ...item,
+          isCompleted: !item.isCompleted,
+          completedAtTimestamp: !item.isCompleted ? Date.now() : undefined,
+          lastUpdatedTimestamp: Date.now(),
+        }
+      }
+
+      return item
+    })
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
     setShoppingListItems(newShoppingListItems)
     saveToStorage('shoppingListItems', newShoppingListItems)
